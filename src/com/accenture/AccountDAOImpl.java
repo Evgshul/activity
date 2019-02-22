@@ -43,7 +43,7 @@ public class AccountDAOImpl implements AccountDAO {
             throws AccountDAOException {
         List<Account> results = new ArrayList<Account>();
         try {
-            PreparedStatement pStmt = conn.prepareStatement("select * from account where first_name like ? AND last_name like ?");
+            PreparedStatement pStmt = conn.prepareStatement("select * from account where first_name like ? and last_name like ?");
             pStmt.setString(1, '%' + firstName.toUpperCase() + '%');
             pStmt.setString(2, '%' + lastName.toUpperCase() + '%');
 
@@ -82,6 +82,23 @@ public class AccountDAOImpl implements AccountDAO {
     // 5 - Complete implementation for insertAccount
     public boolean insertAccount(String id, String firstName, String lastName,
                                  String email, float balance) throws AccountDAOException {
+        try {
+            PreparedStatement pStmt = conn.prepareStatement("insert into account values(?,?,?,?,?)");
+            pStmt.setString(1, id);
+            pStmt.setString(2, firstName);
+            pStmt.setString(3, lastName);
+            pStmt.setString(4, email);
+            pStmt.setFloat(5, balance);
+
+            pStmt.executeUpdate();
+
+            conn.commit();
+
+
+        } catch (SQLException e) {
+            throw new AccountDAOException(AccountDAOException.ERROR_INSERT_ACCOUNT, e);
+        }
+
 
         return false;
     }
@@ -89,17 +106,53 @@ public class AccountDAOImpl implements AccountDAO {
     // 6 - Complete implementation for deposit. It should ensure that the
     // account balance is increased by the amount deposited.
     public boolean deposit(String id, float amount) throws AccountDAOException {
+
+        try {
+            PreparedStatement pStmt = conn.prepareStatement("update account set balance=balance+? where id=?");
+
+            pStmt.setFloat(1, amount);
+            pStmt.setString(2, id);
+            pStmt.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            throw new AccountDAOException(AccountDAOException.ERROR_FIND_ID, e);
+        }
+
         return false;
     }
 
     // 7 - Complete implementation for withdraw. It should ensure that the
     // account balance is reduced by the amount deposited.
     public boolean withdraw(String id, float amount) throws AccountDAOException {
+
+        try {
+            PreparedStatement pStmt = conn.prepareStatement("update account set balance=balance+? where id=?");
+
+            pStmt.setString(1, id);
+            pStmt.setFloat(2, amount);
+            pStmt.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            throw new AccountDAOException(AccountDAOException.ERROR_FIND_ID, e);
+        }
         return false;
     }
 
     // 8 - Complete implementation for deleteAccount
     public boolean deleteAccount(String id) throws AccountDAOException {
+        try {
+            PreparedStatement pStmt = conn.prepareStatement("delete from account where id = ?");
+
+            pStmt.setString(1, id);
+            pStmt.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new AccountDAOException(AccountDAOException.ERROR_FIND_ID, e);
+        }
+
+
         return false;
     }
 
